@@ -1,4 +1,7 @@
 class LocationsController < ApplicationController
+  def index
+  end
+
   def create
     @location = Location.new
     @location.latitude = params[:location][:latitude]

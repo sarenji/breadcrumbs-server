@@ -48,7 +48,6 @@ Breadcrumbs::Application.routes.draw do
 
   # You can have the root of your site routed with "root"
   # just remember to delete public/index.html.
-  # root :to => 'welcome#index'
 
   # See how all your routes lay out with "rake routes"
 
@@ -57,4 +56,5 @@ Breadcrumbs::Application.routes.draw do
   # match ':controller(/:action(/:id))(.:format)'
 
   resources :locations, :only => [:create]
+  root :to => 'locations#index'
 end

@@ -1,0 +1,15 @@
+!!! 5
+%html
+  %head
+    %title Breadcrumbs
+    = stylesheet_link_tag 'leaflet'
+    /[if lte IE 8]
+      = stylesheet_link_tag 'leaflet.ie'
+    :css
+      html { height: 100% }
+      body { height: 100%; margin: 0; padding: 0 }
+      #map_canvas { height: 100% }
+    = javascript_include_tag "leaflet.js"
+    = javascript_include_tag "map.js"
+  %body{onload: "initialize()"}
+    = yield
