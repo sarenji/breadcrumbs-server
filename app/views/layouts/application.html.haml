@@ -9,7 +9,11 @@
       html { height: 100% }
       body { height: 100%; margin: 0; padding: 0 }
       #map_canvas { height: 100% }
-    = javascript_include_tag "leaflet.js"
-    = javascript_include_tag "map.js"
-  %body{onload: "initialize()"}
+    = javascript_include_tag "leaflet"
+    = javascript_include_tag "application"
+  %body
     = yield
+    :javascript
+      $(function() {
+        initialize(#{Location.all.to_json});
+      });

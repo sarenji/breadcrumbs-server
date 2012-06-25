@@ -1,31 +1,34 @@
-function initialize() {
-  // initialize the map on the "map" div
+function initialize(json) {
   var map = new L.Map('map');
-
-  // create a CloudMade tile layer (or use other provider of your choice)
   var cloudmade = new L.TileLayer('http://{s}.tile.cloudmade.com/5c71e56515a44dc0998bf0f8ea2c265f/997/256/{z}/{x}/{y}.png', {
       attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
       maxZoom: 18
   });
 
-  // add the CloudMade layer to the map set the view to a given center and zoom
-  var etsy = new L.LatLng(40.702963, -73.989850);
-  map.addLayer(cloudmade).setView(etsy, 17);
+  var cloudmadeLayer = map.addLayer(cloudmade);
 
-  var other = new L.LatLng(40.735527, -73.982568);
-  var other2 = new L.LatLng(40.734779, -73.983148);
+  // TODO: Segregate by date or something.
+  var markers = [];
+  var latLongs = [];
+  for (var i = 0; i < json.length; i++) {
+    var location = json[i];
+    var latLong = new L.LatLng(location.latitude, location.longitude);
+    var marker = new L.Marker(latLong);
+    latLongs.push(latLong);
+    markers.push(marker);
+    map.addLayer(marker);
+  }
 
-  var marker = new L.Marker(etsy);
-  map.addLayer(marker);
-  map.addLayer(new L.Marker(other));
-
-  var polyline = new L.Polyline([etsy, other2, other], {
+  var polyline = new L.Polyline(latLongs, {
     color: 'red',
     opacity: .75,
     clickable: false,
     stroke: true
   });
+
   map.addLayer(polyline);
+
+  cloudmadeLayer.setView(latLongs[0], 17);
 
   setInterval(function() {
     polyline.setStyle({color: "#" + HSVtoRGB(((+new Date) >> 2) % 360)});
