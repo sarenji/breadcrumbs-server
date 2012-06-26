@@ -7,9 +7,11 @@ function initialize(json) {
 
   var cloudmadeLayer = map.addLayer(cloudmade);
 
-  // TODO: Segregate by date or something.
+  var groups = {};
   var markers = [];
   var latLongs = [];
+  var polylines = [];
+
   for (var i = 0; i < json.length; i++) {
     var location = json[i];
     var latLong = new L.LatLng(location.latitude, location.longitude);
@@ -17,27 +19,39 @@ function initialize(json) {
     latLongs.push(latLong);
     markers.push(marker);
     map.addLayer(marker);
+    if (!(location.unique_id in groups)){
+      groups[location.unique_id] = [latLong];
+    } else {
+      groups[location.unique_id].push(latLong);
+    }
   }
 
-  var polyline = new L.Polyline(latLongs, {
-    color: 'red',
-    opacity: .75,
-    clickable: false,
-    stroke: true
-  });
+  for (var unique_id in groups) {
+    var polyline = new L.Polyline(groups[unique_id], {
+      color: '#' + randomHex(),
+      opacity: .75,
+      clickable: false,
+      stroke: true
+    });
 
-  map.addLayer(polyline);
+    map.addLayer(polyline);
+    polylines.push(polyline);
+  }
 
-  cloudmadeLayer.setView(latLongs[0], 17);
+  cloudmadeLayer.setView(latLongs[latLongs.length - 1], 17);
 
   setInterval(function() {
-    polyline.setStyle({color: "#" + HSVtoRGB(((+new Date) >> 2) % 360)});
+    for (var i = 0; i < polylines.length; i++) {
+      polylines[i].setStyle({
+        color: "#" + HSVtoRGB(((+new Date + i * 1000) >> 2) % 360)
+      });
+    }
   }, 10);
 }
 
 function HSVtoRGB(hue, saturation, value) {
-  saturation = saturation || 1;
-  value = value || 1;
+  saturation = saturation === undefined ? 1 : saturation;
+  value = value === undefined ? 1 : value;
   var chroma = value * saturation;
   var huePrime = hue / 60;
   var x = chroma * (1 - Math.abs(huePrime % 2 - 1));
@@ -63,4 +77,8 @@ function HSVtoRGB(hue, saturation, value) {
   } else if (huePrime >= 5 && huePrime < 6) {
     return chroma + "00" + x;
   }
+}
+
+function randomHex() {
+  return Math.floor(Math.random() * 0xFFFFFF).toString(16);
 }
